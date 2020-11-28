@@ -8,7 +8,7 @@ const suppliersController = require('../controllers/suppliers');
 
 /**
  * @swagger
- * /suppliers/all-suppliers:
+ * /suppliers/all:
  *   get:
  *     security:
  *       - bearerAuth: []
@@ -19,19 +19,19 @@ const suppliersController = require('../controllers/suppliers');
  *       '200':
  *         description: OK
  */
-router.get('/all-suppliers',authToken.authenticateToken,suppliersController.getSuppliers);
+router.get('/all',authToken.authenticateToken,suppliersController.getSuppliers);
 
 /**
  * @swagger
  * path:
- *   /suppliers/get-supplier:
+ *   /suppliers/{id}:
  *     get:
  *       security:
  *         - bearerAuth: []
  *       summary: Returns a Supplier by id
  *       tags: [Suppliers]
  *       parameters:
- *         - in: query
+ *         - in: path
  *           name: id
  *           required: true
  *           description: id of item base unit to return
@@ -51,12 +51,12 @@ router.get('/all-suppliers',authToken.authenticateToken,suppliersController.getS
  *         default:
  *           description: Unexpected error
  */
-router.get('/get-supplier',authToken.authenticateToken,suppliersController.getSupplierByID);
+router.get('/:id',authToken.authenticateToken,suppliersController.getSupplierByID);
 
 /**
  * @swagger
  *
- * /suppliers/add-supplier:
+ * /suppliers/:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -87,19 +87,19 @@ router.get('/get-supplier',authToken.authenticateToken,suppliersController.getSu
  *       '400':
  *         description: Unexpected error
  */
-router.post('/add-supplier',authToken.authenticateToken,suppliersController.createSupplier);
+router.post('/',authToken.authenticateToken,suppliersController.createSupplier);
 
 /**
  * @swagger
  * path:
- *   /suppliers/update-supplier:
+ *   /suppliers/{id}:
  *     put:
  *       security:
  *         - bearerAuth: []
  *       summary: Updates a Supplier by id
  *       tags: [Suppliers]
  *       parameters:
- *         - in: query
+ *         - in: path
  *           name: id
  *           required: true
  *           description: id of Supplier to update
@@ -128,6 +128,6 @@ router.post('/add-supplier',authToken.authenticateToken,suppliersController.crea
  *         '200':
  *           description: updated
  */
-router.put('/update-supplier',authToken.authenticateToken,suppliersController.updateSupplier);
+router.put('/:id',authToken.authenticateToken,suppliersController.updateSupplier);
 
 module.exports=router;

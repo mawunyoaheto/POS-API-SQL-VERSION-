@@ -16,9 +16,12 @@ const swaggerUi = require('swagger-ui-express');
 const session = require('express-session');
 
 const user_routes = require("./api/v1/routes/users");
+const usercategory_routes = require("./api/v1/routes/usercategories");
 const product_routes = require("./api/v1/routes/products");
+const productCategory_routes = require("./api/v1/routes/product_categories");
 const itembaseunit_routes = require("./api/v1/routes/itembaseunit");
 const moduletranstages_routes = require("./api/v1/routes/modules_trans_stages");
+const transactions_routes = require("./api/v1/routes/transaction_stages");
 const suppliers_routes = require("./api/v1/routes/suppliers");
 const tax_routes = require("./api/v1/routes/tax");
 const outlet_routes = require("./api/v1/routes/outlets");
@@ -125,9 +128,12 @@ const swaggerOptions = {
   app.use(compression());
 
   app.use('/api/v1/users',user_routes);
+  app.use('/api/v1/usercategory',usercategory_routes);
   app.use('/api/v1/products',product_routes);
+  app.use('/api/v1/productcategory',productCategory_routes);
   app.use('/api/v1/items',itembaseunit_routes);
-  app.use('/api/v1/moduletranstages',moduletranstages_routes);
+  app.use('/api/v1/modules',moduletranstages_routes);
+  app.use('/api/v1/transactions',transactions_routes);
   app.use('/api/v1/suppliers',suppliers_routes);
   app.use('/api/v1/taxes',tax_routes);
   app.use('/api/v1/outlets',outlet_routes);

@@ -223,26 +223,31 @@ async function createOrderReceival(req, res) {
 
         const receivalID = records.recordset[0].id
 
-        for (var i = 1; i < req.body.details.length; i++) {
+        for (var i = 0; i < req.body.details.length; i++) {
 
 
             const orderReceivalLinesQuery = `INSERT INTO orderreceivallines(purchaseorderlineid, receivalid, itemid, unitcost, receivedqty,
                 receivedunitid, batchnumber, expirydate, outletid, createtime, createuserid, usermachinename, usermachineip)
-                VALUES ('${req.body[i].orderlineid}', '${receivalID}', '${req.body.details[i].itemid}', '${req.body.details[i].unitcost}', 
+                VALUES ('${req.body.details[i].orderlineid}', '${receivalID}', '${req.body.details[i].itemid}', '${req.body.details[i].unitcost}', 
                 '${req.body.details[i].qty}', '${req.body.details[i].unitid}', '${req.body.details[i].batchno}', '${req.body.details[i].expirydate}', '${req.body.details[i].outletID}',
                 '${req.body.receivedDate}', '${userid}', '${userMachineName}', '${userMachineIP}')`;
+
+                const updateStatusQuery = `UPDATE orderapprovallines SET stageid = 12 WHERE purchaseorderlineid='${req.body.details[i].orderlineid}' and stageid =11 AND archived='No' `;
 
             //get product details from here by calling funtion getProductDetails(itemid, outletid) 
             var prodDetails = await getProductDetails(req.body.details[i].itemid, req.body.details[i].outletID);
 
-            const productStockQuery = `INSERT INTO productstock(productid,stocklevel,batchnumber,expirydate,unitcost,baseitemid,outletid,actualstocklevel,stageid,
-            statusid,receiverid,transactionid,reorderlevel,eoq,averageconsumption,leadtime,minstocklevel,maxstocklevel,usermachinename,usermachineip,createtime,createuserid)
-           VALUES('${req.body.details[i].itemid}','${prodDetails.totalStock}','${req.body.details[i].batchno}','${req.body.details[i].expirydate}','${req.body.details[i].unitcost}','${req.body.details[i].unitid}',
-          ${req.body.details[i].outletID}','${req.body.stageid}','${req.body.statusid}','${userid}','12','','','','','','','${userMachineName}','${userMachineIP}',
-          '${req.body.createTime}','${userid}')`;
+            const productStockQuery = `INSERT INTO productstock(productid,stocklevel,batchnumber,expirydate,qty,unitcost,baseitemid,outletid,stageid,
+            statusid,transactionid,reorderlevel,eoq,averageconsumption,leadtime,minstocklevel,maxstocklevel,usermachinename,usermachineip,createtime,createuserid)
+           VALUES('${req.body.details[i].itemid}','${prodDetails.totalStock}','${req.body.details[i].batchno}','${req.body.details[i].expirydate}','${req.body.details[i].qty}',
+           '${req.body.details[i].unitcost}','${req.body.details[i].unitid}','${req.body.details[i].outletID}','12','2','12','0','0','0','0','0','0','${userMachineName}','${userMachineIP}',
+          '${req.body.receivedDate}','${userid}')`;
 
 
             await trnxReq.query(orderReceivalLinesQuery);
+            
+            await trnxReq.query(updateStatusQuery);  
+
             await trnxReq.query(productStockQuery);
 
         }
@@ -315,11 +320,11 @@ async function approveOrder(req, res) {
 
 
                 const approvalLinesQuery = `INSERT INTO orderapprovallines(purchaseorderlineid, productid, unitcost, approvedqty, linetotalcost,
-                productunitid, reorderlevel, stocklevel,remarks, outletid, baseitemid, createtime, approvalid, createuserid,
+                productunitid, reorderlevel, stocklevel,remarks, outletid, baseitemid, createtime,stageid,statusid, approvalid, createuserid,
                 usermachinename, usermachineip) VALUES ('${req.body.approvaldetails[i].purchaseOrderLineID}', '${req.body.approvaldetails[i].productID}', 
                 '${req.body.approvaldetails[i].unitCost}','${req.body.approvaldetails[i].approvedtQty}','${req.body.approvaldetails[i].approvedLineTotalCost}', '${req.body.approvaldetails[i].productUnitID}',
                 '${req.body.approvaldetails[i].reOrderLevel}', '${req.body.approvaldetails[i].stockLevel}', '${req.body.approvaldetails[i].remarks}',
-                '${req.body.approvaldetails[i].outletID}','${req.body.approvaldetails[i].baseItemID}','${normalizedDate}', '${orderApprovalSummaryID}', 
+                '${req.body.approvaldetails[i].outletID}','${req.body.approvaldetails[i].baseItemID}','${normalizedDate}','11','3', '${orderApprovalSummaryID}', 
                 '${userid}','${userMachineName}', '${userMachineIP}')`;
 
                 const updateStageStausIDQuery = `UPDATE orderlines set stageid=11, statusid=3, approvedqty='${req.body.approvaldetails[i].approvedtQty}' 
@@ -606,7 +611,7 @@ async function getOrdersPendingReceival(req, res) {
 
         recordset = await pool.query(queryString)
 
-        if (recordset.rowsAffected > 0) {
+        if (recordset.length > 0 ||recordset.rowsAffected > 0)  {
 
             // var orderSummary ={}
             var pendingApprovedOrders = []
@@ -646,7 +651,7 @@ async function getOrdersPendingReceival(req, res) {
 
         } else {
 
-            ordersRes = respBody.ResponseBody('failed', '', 'No record(s) found');
+            ordersRes = respBody.ResponseBody('failed', '', 'Sorry No Pending orders(s) for receival');
             resp.json(404, ordersRes);
         }
 
@@ -738,20 +743,33 @@ async function getOrdersReceivalSummary(id) {
 
 async function getProductDetails(productID, outletID) {
 
+
+
     const productStockQuery = `select sum(qty) AS totalStock from productstock WHERE id='${productID}' AND outletid='${outletID}'`
     const productDescriptionQuery = `select * from products WHERE id='${productID}'`
     const pool = await poolPromise;
 
+    var productstock =0;
     try {
-        const productStockrecordset = await pool.query(productStockQuery);
         const productDesRecordset = await pool.query(productDescriptionQuery)
+        const productStockrecordset = await pool.query(productStockQuery);
+        
+
+        if (productStockrecordset.length >0) {
+
+            productstock=productStockrecordset[0].totalStock;
+            
+        } else {
+            
+            productstock=0;
+        }
 
         var productDetails = {
             description: productDesRecordset.recordset[0].description,
-            extDescription: productDescriptionQuery[0].extended_description,
-            costPrice: productDescriptionQuery[0].cost_price,
-            sellingPrice: productDescriptionQuery[0].s_price,
-            totalStock: productStockrecordset[0].totalStock
+            extDescription: productDesRecordset.recordset[0].extended_description,
+            costPrice: productDesRecordset.recordset[0].cost_price,
+            sellingPrice: productDesRecordset.recordset[0].s_price,
+            totalStock: productstock
         }
 
         return productDetails
@@ -854,28 +872,33 @@ async function getPendingOrdersReceivalDetails(approvalID) {
 
 }
 
-async function updateOrderStatus(approvalID) {
+async function updateOrderStatus(transid,lineid) {
 
-    const updateOrderAprovalLinesSatus = `UPDATE * from orderapprovallines WHERE approvalid='${approvalID}' and stageid =11 AND archived='No' `;
+
+    
     const pool = await poolPromise;
+
+    switch (transid,lineid) {
+
+        //
+        case 12:
+            const updateStatusQuery = `UPDATE orderapprovallines SET stageid = 12 WHERE approvalineid='${lineid}' and stageid =11 AND archived='No' `;
+            break;
+    
+        default:
+            break;
+    }
 
     try {
 
-        const recordset = await pool.query(queryString)
+        const recordset = await pool.query(updateStatusQuery)
 
-        // if (err) {
-        //     return res.status(404).json({ 'message': 'failed' });
-
-        // } else {
         if (recordset.rowsAffected > 0) {
-            // send records as a response
 
-            // console.log(orderID,recordset.recordset)
-            return recordset.recordset;
-
+            return true
 
         } else {
-            return recordset.recordset;
+            return false;
         }
 
         // }
@@ -897,7 +920,8 @@ module.exports = {
     getOrderPendingApprovalSummary,
     getOrderByStageStatus,
     getPendingOrdersSummaryByInvoice,
-    getOrdersPendingReceival
+    getOrdersPendingReceival,
+    getProductDetails
 }
 
 

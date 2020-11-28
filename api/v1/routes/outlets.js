@@ -16,7 +16,7 @@ const outletsController = require('../controllers/outlets');
 
 /**
  * @swagger
- * /outlets/all-outlets:
+ * /outlets/all:
  *  get:
  *    security:
  *      - bearerAuth: []
@@ -31,19 +31,19 @@ const outletsController = require('../controllers/outlets');
  *      '400':
  *        description: Unexpected error
  */
-router.get('/all-outlets',authToken.authenticateToken,outletsController.getOutlets);
+router.get('/all',authToken.authenticateToken,outletsController.getOutlets);
 
 /**
  * @swagger
  * path:
- *   /outlets/get-outlet:
+ *   /outlets/{id}:
  *     get:
  *       security:
  *         - bearerAuth: []
  *       summary: Returns an Outlet by id
  *       tags: [Outlets]
  *       parameters:
- *         - in: query
+ *         - in: path
  *           name: id
  *           required: true
  *           description: id of Outlet to return
@@ -63,13 +63,13 @@ router.get('/all-outlets',authToken.authenticateToken,outletsController.getOutle
  *         default:
  *           description: Unexpected error
  */
-router.get('/get-outlet',authToken.authenticateToken,outletsController.getOutletsByID);
+router.get('/:id',authToken.authenticateToken,outletsController.getOutletsByID);
 
 
 /**
  * @swagger
  *
- * /outlets/add-outlet:
+ * /outlets/:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -108,19 +108,19 @@ router.get('/get-outlet',authToken.authenticateToken,outletsController.getOutlet
  *       '400':
  *         description: Unexpected error
  */
-router.post('/add-outlet',authToken.authenticateToken,outletsController.createOutlet);
+router.post('/',authToken.authenticateToken,outletsController.createOutlet);
 
 /**
  * @swagger
  *
- * /outlets/update-outlet:
+ * /outlets/{id}:
  *   put:
  *     security:
  *       - bearerAuth: []
  *     summary: Update an Outlet (Branch)
  *     tags: [Outlets]
  *     parameters:
- *       - in: query
+ *       - in: path
  *         name: id
  *         required: true
  *         description: ID of outlet to update
@@ -159,6 +159,6 @@ router.post('/add-outlet',authToken.authenticateToken,outletsController.createOu
  *       '400':
  *         description: Unexpected error
  */
-router.put('/update-outlet',authToken.authenticateToken,outletsController.updateOutlet);
+router.put('/:id',authToken.authenticateToken,outletsController.updateOutlet);
 
 module.exports=router;

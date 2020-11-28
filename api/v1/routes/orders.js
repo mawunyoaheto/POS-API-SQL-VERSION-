@@ -42,6 +42,80 @@ router.get('/all',authToken.authenticateToken,ordersController.getOrderPendingAp
 
 /**
  * @swagger
+ * /orders/ip:
+ *  get:
+ *    security:
+ *      - bearerAuth: []
+ *    summary: Get IP Address
+ *    tags: [Purchase Orders]
+ *    description: Get IP Address
+ *    responses:
+ *      '200':
+ *        description: OK
+ *      '404':
+ *        description: No records found
+ *      '400':
+ *        description: Unexpected error
+ */
+router.get('/ip', function (req, res){     
+   // console.log("REQ:: "+req.headers.host);  
+    // console.log (req.headers['x-forwarded-for'] || req.connection.remoteAddress);   
+    // res.end(req.headers.host); 
+
+    require('dns').reverse(req.connection.remoteAddress, function(err, domains) {
+        console.log(domains);
+    });
+});
+
+
+router.get('/product', function(req,res){
+    
+
+    var respn = ordersController.getProductDetails(req.query.productid, req.query.outletid);
+    // return respn;
+    return res.status(404).json({ 'message': 'failed' })
+});
+
+// /**
+//  * @swagger
+//  * path:
+//  *   /productdetails/
+//  *     get:
+//  *       security:
+//  *         - bearerAuth: []
+//  *       summary: Returns Product details by product id
+//  *       tags: [Products]
+//  *       parameters:
+//  *         - in: query
+//  *           name: productid
+//  *           required: false
+//  *           description: id of product details to return
+//  *           schema:
+//  *             type: string
+//  *         - in: query
+//  *           name: outletid
+//  *           required: false
+//  *           description: id of product's outlet
+//  *           schema:
+//  *             type: integer
+//  *       responses:
+//  *         '200':
+//  *           description: OK
+//  *           content:
+//  *             application/json:
+//  *               schema:
+//  *                 type: object
+//  *         '400':
+//  *           description: The specified product id is invalid (not a number).
+//  *         '404':
+//  *           description: The specified outletid was not found.
+//  *         default:
+//  *           description: Unexpected error
+//  */
+// router.get('/productdetails',authToken.authenticateToken,ordersController.getProductDetails(req.query.productid, req.query.outletid));
+
+/**
+ * @swagger
  * path:
  *   /orders/{invoiceNo}:
  *     get:
@@ -379,7 +453,7 @@ router.get('/pendingreceival/all',authToken.authenticateToken,ordersController.g
  *                   items:
  *                     type: object
  *                     properties:
- *                       purchaseOrderLineID:
+ *                       orderlineid:
  *                         type: integer
  *                       itemid:
  *                         type: integer

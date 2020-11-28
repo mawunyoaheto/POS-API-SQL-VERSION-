@@ -16,7 +16,7 @@ const districtsController = require('../controllers/districts');
 
 /**
  * @swagger
- * /districts/all-districts:
+ * /districts/all:
  *  get:
  *    security:
  *      - bearerAuth: []
@@ -31,19 +31,19 @@ const districtsController = require('../controllers/districts');
  *      '400':
  *        description: Unexpected error
  */
-router.get('/all-districts',authToken.authenticateToken,districtsController.getDistricts);
+router.get('/all',authToken.authenticateToken,districtsController.getDistricts);
 
 /**
  * @swagger
  * path:
- *   /districts/get-district:
+ *   /districts/{id}:
  *     get:
  *       security:
  *         - bearerAuth: []
  *       summary: Returns a district by id
  *       tags: [districts]
  *       parameters:
- *         - in: query
+ *         - in: path
  *           name: id
  *           required: true
  *           description: id of district to return
@@ -63,17 +63,17 @@ router.get('/all-districts',authToken.authenticateToken,districtsController.getD
  *         default:
  *           description: Unexpected error
  */
-router.get('/get-district',authToken.authenticateToken,districtsController.getDistrictByID);
+router.get('/:id',authToken.authenticateToken,districtsController.getDistrictByID);
 
 
 /**
  * @swagger
  *
- * /districts/add-district:
+ * /districts/:
  *   post:
  *     security:
  *       - bearerAuth: []
- *     summary: Add an Outlet (Branch)
+ *     summary: Add a District
  *     tags: [districts]
  *     requestBody:
  *       required: true
@@ -96,19 +96,19 @@ router.get('/get-district',authToken.authenticateToken,districtsController.getDi
  *       '400':
  *         description: Unexpected error
  */
-router.post('/add-district',authToken.authenticateToken,districtsController.createDistrict);
+router.post('/',authToken.authenticateToken,districtsController.createDistrict);
 
 /**
  * @swagger
  *
- * /districts/update-outlet:
+ * /districts/{id}:
  *   put:
  *     security:
  *       - bearerAuth: []
  *     summary: Update a district
  *     tags: [districts]
  *     parameters:
- *       - in: query
+ *       - in: path
  *         name: id
  *         required: true
  *         description: ID of district to update
@@ -135,6 +135,6 @@ router.post('/add-district',authToken.authenticateToken,districtsController.crea
  *       '400':
  *         description: Unexpected error
  */
-router.put('/update-district',authToken.authenticateToken,districtsController.updateDistrict);
+router.put('/:id',authToken.authenticateToken,districtsController.updateDistrict);
 
 module.exports=router;

@@ -47,7 +47,7 @@ async function getPaymentModes(req, res) {
     //GET PAYMENT MODE BY ID
     async function getPaymentModeByID(req, res) {
         var resp = new Response.Response(res);
-        const id = req.query.id
+        const id = req.params.id
         const queryString = `select * FROM payment_modes WHERE id='${id}'`
         const pool = await poolPromise;
 
@@ -133,7 +133,7 @@ async function getPaymentModes(req, res) {
     //UPDATE PAYMENT MODE
     async function updatePaymentMode(req, res) {
         var resp = new Response.Response(res);
-        const id = req.query.id;
+        const id = req.params.id;
         const pool = await poolPromise;
 
         const values = [

@@ -55,7 +55,7 @@ async function getDistricts(req, res, error) {
 
 async function getDistrictByID(req, res, error) {
     var resp = new Response.Response(res);
-    var id = req.query.id;
+    var id = req.params.id;
     var queryString = `select * FROM Districts WHERE id='${id}'`
     const pool = await poolPromise;
 
@@ -132,7 +132,7 @@ async function createDistrict(req, res) {
 async function updateDistrict(req, res) {
 
     var resp = new Response.Response(res);
-    const id = req.query.id;
+    const id = req.params.id;
 
     const pool = await poolPromise;
 

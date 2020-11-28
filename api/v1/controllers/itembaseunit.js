@@ -49,7 +49,7 @@ async function getItemBaseUnits(req, res) {
 
 async function getItemBaseUnitByID(req, res) {
   var resp = new Response.Response(res);
-  const id = req.query.id;
+  const id = req.params.id;
 
   //const pool = await db.dbConnection()
 
@@ -128,7 +128,7 @@ async function createItemBaseUnit(req, res) {
 //update item base unit
 async function updateItemBaseUnit(req, res, error) {
   var resp = new Response.Response(res);
-  const id = req.query.id;
+  const id = req.params.id;
 //   const pool = await db.dbConnection();
 
   const pool = await poolPromise;

@@ -49,7 +49,7 @@ async function getSuppliers(req, res, error) {
 
 async function getSupplierByID(req, res) {
   var resp = new Response.Response(res);
-  const id = req.query.id;
+  const id = req.params.id;
   const pool = await poolPromise;
   const query = `SELECT * FROM suppliers WHERE id ='${id}'`
 
@@ -124,7 +124,7 @@ async function createSupplier(req, res) {
 
 async function updateSupplier(req, res, error) {
   var resp = new Response.Response(res);
-  const id = req.query.id;
+  const id = req.params.id;
   const pool = await poolPromise;
 
   const values = [

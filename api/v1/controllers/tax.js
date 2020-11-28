@@ -54,7 +54,7 @@ async function getTax(req, res, error) {
 async function getTaxByID(req, res, error) {
 
     var resp = new Response.Response(res);
-    const id = req.query.id;
+    const id = req.params.id;
     const queryString = `SELECT * FROM taxes WHERE id ='${id}'`
     const pool = await poolPromise;
 
@@ -137,7 +137,7 @@ async function createTax(req, res, error) {
 
 async function updateTax(req, res, error) {
     var resp = new Response.Response(res);
-    const id = req.query.id;
+    const id = req.params.id;
     const pool = await poolPromise;
 
     const values = [

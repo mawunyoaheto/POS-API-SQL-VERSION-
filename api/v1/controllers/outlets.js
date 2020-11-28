@@ -55,7 +55,7 @@ async function getOutlets(req, res, error) {
 
 async function getOutletsByID(req, res, error) {
     var resp = new Response.Response(res);
-    var id = req.query.id;
+    var id = req.params.id;;
     var queryString = `select * FROM outlets WHERE id='${id}'`
     const pool = await poolPromise;
 
@@ -146,7 +146,7 @@ async function createOutlet(req, res) {
 async function updateOutlet(req, res) {
 
     var resp = new Response.Response(res);
-    const id = req.query.id;
+    const id = req.params.id;
 
     const pool = await poolPromise;
 

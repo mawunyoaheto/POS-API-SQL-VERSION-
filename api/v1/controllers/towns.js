@@ -55,7 +55,7 @@ async function getTowns(req, res, error) {
 
 async function getTownByID(req, res, error) {
     var resp = new Response.Response(res);
-    var id = req.query.id;
+    var id = req.params.id;
     var queryString = `select * FROM towns WHERE id='${id}'`
     const pool = await poolPromise;
 
@@ -91,7 +91,7 @@ async function getTownByID(req, res, error) {
 //GET TOWNS BY DISTRICT ID
 async function getTownByDistrictID(req, res, error) {
     var resp = new Response.Response(res);
-    var id = req.query.id;
+    var id = req.params.districtid;
     var queryString = `select * FROM towns WHERE districtid='${id}'`
     const pool = await poolPromise;
 
@@ -126,7 +126,7 @@ async function getTownByDistrictID(req, res, error) {
 
 async function ggetTownByDistrictIDTownDescription(req, res, error) {
     var resp = new Response.Response(res);
-    var id = req.query.id;
+    var id = req.params.id;
     var id = req.query.description;
 
     var queryString = `select * FROM towns WHERE districtid='${id}' AND description LIKE '%${req.body.description}%'`
@@ -204,7 +204,7 @@ async function createTown(req, res) {
 async function updateTown(req, res) {
 
     var resp = new Response.Response(res);
-    const id = req.query.id;
+    const id = req.params.id;
 
     const pool = await poolPromise;
 

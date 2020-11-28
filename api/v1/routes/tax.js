@@ -9,7 +9,7 @@ const taxController = require('../controllers/tax');
 
 /**
  * @swagger
- * /taxes/all-tax:
+ * /taxes/all:
  *  get:
  *    security:
  *      - bearerAuth: []
@@ -24,19 +24,19 @@ const taxController = require('../controllers/tax');
  *      '400':
  *        description: Unexpected error
  */
-router.get('/all-tax',authToken.authenticateToken,taxController.getTax);
+router.get('/all',authToken.authenticateToken,taxController.getTax);
 
 /**
  * @swagger
  * path:
- *   /taxes/get-tax:
+ *   /taxes/{id}:
  *     get:
  *       security:
  *         - bearerAuth: []
  *       summary: Returns Tax by id
  *       tags: [Tax]
  *       parameters:
- *         - in: query
+ *         - in: path
  *           name: id
  *           required: true
  *           description: id of Tax to return
@@ -56,12 +56,12 @@ router.get('/all-tax',authToken.authenticateToken,taxController.getTax);
  *         default:
  *           description: Unexpected error
  */
-router.get('/get-tax',authToken.authenticateToken,taxController.getTaxByID);
+router.get('/:id',authToken.authenticateToken,taxController.getTaxByID);
 
 /**
  * @swagger
  *
- * /taxes/add-tax:
+ * /taxes/:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -90,12 +90,12 @@ router.get('/get-tax',authToken.authenticateToken,taxController.getTaxByID);
  *       '400':
  *         description: Unexpected error
  */
-router.post('/add-tax',authToken.authenticateToken,taxController.createTax);
+router.post('/',authToken.authenticateToken,taxController.createTax);
 
 /**
  * @swagger
  *
- * /taxes/update-tax:
+ * /taxes/{id}:
  *   put:
  *     security:
  *       - bearerAuth: []
@@ -131,6 +131,6 @@ router.post('/add-tax',authToken.authenticateToken,taxController.createTax);
  *       '400':
  *         description: Unexpected error
  */
-router.put('/update-tax',authToken.authenticateToken,taxController.updateTax);
+router.put('/:id',authToken.authenticateToken,taxController.updateTax);
 
 module.exports=router;

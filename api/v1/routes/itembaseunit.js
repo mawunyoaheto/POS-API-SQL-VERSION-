@@ -8,7 +8,7 @@ const itemsController = require('../controllers/itembaseunit');
 
 /**
  * @swagger
- * /items/all-baseunits:
+ * /itembaseunit/all:
  *  get:
  *    security:
  *      - bearerAuth: []
@@ -19,21 +19,21 @@ const itemsController = require('../controllers/itembaseunit');
  *      '200':
  *        description: OK
  */
-router.get('/all-baseunits',authToken.authenticateToken,itemsController.getItemBaseUnits);
+router.get('/all',authToken.authenticateToken,itemsController.getItemBaseUnits);
 
 
 
 /**
  * @swagger
  * path:
- *   /items/get-baseunit:
+ *   /itembaseunit/{id}:
  *     get:
  *       security:
  *         - bearerAuth: []
  *       summary: Returns an Item Base Unit by id
  *       tags: [ItemBaseUnit]
  *       parameters:
- *         - in: query
+ *         - in: path
  *           name: id
  *           required: true
  *           description: id of item base unit to return
@@ -53,13 +53,13 @@ router.get('/all-baseunits',authToken.authenticateToken,itemsController.getItemB
  *         default:
  *           description: Unexpected error
  */
-router.get('/get-baseunit',authToken.authenticateToken,itemsController.getItemBaseUnitByID);
+router.get('/:id',authToken.authenticateToken,itemsController.getItemBaseUnitByID);
 
 
 /**
  * @swagger
  *
- * /items/add-baseunit:
+ * /itembaseunit/:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -80,19 +80,19 @@ router.get('/get-baseunit',authToken.authenticateToken,itemsController.getItemBa
  *       '200':
  *         description: created
  */
-router.post('/add-baseunit',authToken.authenticateToken,itemsController.createItemBaseUnit);
+router.post('/',authToken.authenticateToken,itemsController.createItemBaseUnit);
 
 /**
  * @swagger
  * path:
- *   /items/update-baseunit:
+ *   /itembaseunit/{id}:
  *     put:
  *       security:
  *         - bearerAuth: []
  *       summary: Updates an Item Base Unit by id
  *       tags: [ItemBaseUnit]
  *       parameters:
- *         - in: query
+ *         - in: path
  *           name: id
  *           required: true
  *           description: id of item base unit to update
@@ -113,7 +113,7 @@ router.post('/add-baseunit',authToken.authenticateToken,itemsController.createIt
  *         '200':
  *           description: updated
  */
-router.put('/update-baseunit',authToken.authenticateToken,itemsController.updateItemBaseUnit);
+router.put('/:id',authToken.authenticateToken,itemsController.updateItemBaseUnit);
 
 
 module.exports=router;

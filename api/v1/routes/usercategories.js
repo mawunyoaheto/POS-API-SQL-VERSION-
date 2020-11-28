@@ -1,28 +1,23 @@
 var express = require('express');
 var router = express.Router();
-const authToken = require('../middleware/auth')
-const regionsController = require('../controllers/regions');
-
-
-/**
-* @swagger
-* tags:
-*   name: Regions
-*   description: Regions
-*/
-
-//Regions routes
-
+const userCatController = require('../controllers/usercategories');
 
 /**
  * @swagger
- * /regions/all:
+ * tags:
+ *   name: User Categories
+ *   description: User management
+ */
+
+ //User Categories route
+
+/**
+ * @swagger
+ * /usercategory/all:
  *  get:
- *    security:
- *      - bearerAuth: []
- *    summary: Returns all regions
- *    tags: [Regions]
- *    description: Get all regions
+ *    summary: Returns all User Categories
+ *    tags: [User Category]
+ *    description: Get all User Categories
  *    responses:
  *      '200':
  *        description: OK
@@ -31,22 +26,20 @@ const regionsController = require('../controllers/regions');
  *      '400':
  *        description: Unexpected error
  */
-router.get('/all',authToken.authenticateToken,regionsController.getRegions);
+router.get('/all', userCatController.getUserCategories);
 
 /**
  * @swagger
  * path:
- *   /regions/{id}:
+ *   /usercategory/{id}:
  *     get:
- *       security:
- *         - bearerAuth: []
- *       summary: Returns a region by id
- *       tags: [Regions]
+ *       summary: Returns a User Category by id
+ *       tags: [User Category]
  *       parameters:
- *         - in: path
+ *         - in: query
  *           name: id
  *           required: true
- *           description: id of region to return
+ *           description: id of User Category to return
  *           schema:
  *             type: integer
  *       responses:
@@ -57,24 +50,21 @@ router.get('/all',authToken.authenticateToken,regionsController.getRegions);
  *               schema:
  *                 type: object
  *         '400':
- *           description: The specified region ID is invalid (not a number).
+ *           description: The specified User Category ID is invalid (not a number).
  *         '404':
- *           description: An Outlet with the region ID was not found.
+ *           description: A User Category with the specified ID was not found.
  *         default:
  *           description: Unexpected error
  */
-router.get('/:id',authToken.authenticateToken,regionsController.getRegionByID);
-
+router.get('/:id', userCatController.getUserCategoryID);
 
 /**
  * @swagger
  *
- * /regions/:
+ * /usercategory/:
  *   post:
- *     security:
- *       - bearerAuth: []
- *     summary: Add a Region
- *     tags: [Regions]
+ *     summary: Add New User Category
+ *     tags: [User Category]
  *     requestBody:
  *       required: true
  *       content:
@@ -82,12 +72,12 @@ router.get('/:id',authToken.authenticateToken,regionsController.getRegionByID);
  *           schema:
  *             type: object
  *             properties:
- *               description:
+ *               category:
  *                 type: string
- *               zoneid:
- *                 type: integer
  *               isactive:
- *                 type: string
+ *                 type: boolean
+ *               createuser_id:
+ *                 type: integer
  *     responses:
  *       '201':
  *         description: created
@@ -96,22 +86,20 @@ router.get('/:id',authToken.authenticateToken,regionsController.getRegionByID);
  *       '400':
  *         description: Unexpected error
  */
-router.post('/',authToken.authenticateToken,regionsController.createRegion);
+router.post('/', userCatController.createUserCategory);
 
 /**
  * @swagger
  *
- * /regions/{id}:
+ * /usercategory/{id}:
  *   put:
- *     security:
- *       - bearerAuth: []
- *     summary: Update a region
- *     tags: [Regions]
+ *     summary: Update User Category
+ *     tags: [User Category]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID of region to update
+ *         description: ID of User Category to update
  *         shema:
  *           type: integer
  *     requestBody:
@@ -121,12 +109,12 @@ router.post('/',authToken.authenticateToken,regionsController.createRegion);
  *           schema:
  *             type: object
  *             properties:
- *               description:
+ *               category:
  *                 type: string
- *               zoneid:
- *                 type: integer
  *               isactive:
- *                 type: string
+ *                 type: boolean
+ *               userId:
+ *                 type: integer
  *     responses:
  *       '201':
  *         description: created
@@ -135,6 +123,6 @@ router.post('/',authToken.authenticateToken,regionsController.createRegion);
  *       '400':
  *         description: Unexpected error
  */
-router.put('/:id',authToken.authenticateToken,regionsController.updateRegion);
+router.put('/:id', userCatController.updateUserCategory);
 
 module.exports=router;

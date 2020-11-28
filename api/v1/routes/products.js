@@ -19,7 +19,7 @@ const productsController = require('../controllers/products');
 /**
  * @swagger
  * path:
- *   /products/products:
+ *   /products/all:
  *     get:
  *       security:
  *         - bearerAuth: []
@@ -33,19 +33,19 @@ const productsController = require('../controllers/products');
  *         '400':
  *           description: Unexpected error
  */
-router.get('/products',authToken.authenticateToken,productsController.getProducts);
+router.get('/all',authToken.authenticateToken,productsController.getProducts);
 
 /**
  * @swagger
  * path:
- *   /products/get-product:
+ *   /products/{id}:
  *     get:
  *       security:
  *         - bearerAuth: []
  *       summary: Returns a product by id
  *       tags: [Products]
  *       parameters:
- *         - in: query
+ *         - in: path
  *           name: productid
  *           required: true
  *           description: id of product to return
@@ -65,11 +65,11 @@ router.get('/products',authToken.authenticateToken,productsController.getProduct
  *         default:
  *           description: Unexpected error
  */
-router.get('/get-product',authToken.authenticateToken,productsController.getProductByID);
+router.get('/:id',authToken.authenticateToken,productsController.getProductByID);
 
 /**
  * @swagger
- * /products/add-product:
+ * /products/:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -106,19 +106,19 @@ router.get('/get-product',authToken.authenticateToken,productsController.getProd
  *       '400':
  *         description: Unexpected error
  */
-router.post('/add-product',authToken.authenticateToken,productsController.createPoduct);
+router.post('/',authToken.authenticateToken,productsController.createPoduct);
 
 /**
  * @swagger
  * path:
- *   /products/update-product:
+ *   /products/{id}:
  *     put:
  *       security:
  *         - bearerAuth: []
  *       summary: Updates a product by id
  *       tags: [Products]
  *       parameters:
- *         - in: query
+ *         - in: path
  *           name: id
  *           required: true
  *           description: id of product to update
@@ -153,130 +153,6 @@ router.post('/add-product',authToken.authenticateToken,productsController.create
  *         '400':
  *           description: Unexpected error
  */
-router.put('/update-product',authToken.authenticateToken,productsController.updateProduct);
-
-
-//product Catgeories routes
-/**
- * @swagger
- * /products/get-categories:
- *  get:
- *    security:
- *      - bearerAuth: []
- *    summary: Returns all Product Categories
- *    tags: [Product Category]
- *    description: Get all Product Categories
- *    responses:
- *      '200':
- *        description: OK
- *      '404':
- *        description: No records found
- *      '400':
- *        description: Unexpected error
- */
-router.get('/get-categories',authToken.authenticateToken,productsController.getProductCategories);
-
-/**
- * @swagger
- * path:
- *   /products/get-category:
- *     get:
- *       security:
- *         - bearerAuth: []
- *       summary: Returns a product category by id
- *       tags: [Product Category]
- *       parameters:
- *         - in: query
- *           name: catid
- *           required: true
- *           description: id of product category to return
- *           schema:
- *             type: integer
- *       responses:
- *         '200':
- *           description: OK
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *         '400':
- *           description: The specified Product Category ID is invalid (not a number).
- *         '404':
- *           description: A Product Category with the specified ID was not found.
- *         default:
- *           description: Unexpected error
- */
-router.get('/get-category',authToken.authenticateToken,productsController.getProductCategoryID);
-
-/**
- * @swagger
- *
- * /products/add-category:
- *   post:
- *     security:
- *       - bearerAuth: []
- *     summary: Add a product category
- *     tags: [Product Category]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               category:
- *                 type: string
- *               isactive:
- *                 type: boolean
- *               userId:
- *                 type: integer
- *     responses:
- *       '201':
- *         description: created
- *       '400':
- *         description: Unexpected error
- */
-router.post('/add-category',authToken.authenticateToken,productsController.createPoductCategory);
-
-/**
- * @swagger
- * path:
- *   /products/update-category:
- *     put:
- *       security:
- *         - bearerAuth: []
- *       summary: Updates a product category by id
- *       tags: [Product Category]
- *       parameters:
- *         - in: query
- *           name: catid
- *           required: true
- *           description: id of product category to update
- *           schema:
- *             type: integer
- *       requestBody:
- *         required: true
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 category:
- *                   type: string
- *                 isactive:
- *                   type: boolean
- *                 userId:
- *                   type: integer
- *       responses:
- *         '201':
- *           description: updated
- *         '404':
- *           description: A Product Category with the specified ID was not found.
- *         default:
- *           description: Unexpected error
- */
-router.put('/update-category',authToken.authenticateToken,productsController.updateProductCategory);
-
-
+router.put('/:id',authToken.authenticateToken,productsController.updateProduct);
 
 module.exports=router;

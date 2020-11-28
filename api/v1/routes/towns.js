@@ -16,7 +16,7 @@ const townsController = require('../controllers/towns');
 
 /**
  * @swagger
- * /towns/all-towns:
+ * /towns/all:
  *  get:
  *    security:
  *      - bearerAuth: []
@@ -31,19 +31,19 @@ const townsController = require('../controllers/towns');
  *      '400':
  *        description: Unexpected error
  */
-router.get('/all-towns',authToken.authenticateToken,townsController.getTowns);
+router.get('/all',authToken.authenticateToken,townsController.getTowns);
 
 /**
  * @swagger
  * path:
- *   /towns/get-town:
+ *   /towns/{id}:
  *     get:
  *       security:
  *         - bearerAuth: []
  *       summary: Returns a town by id
  *       tags: [Towns]
  *       parameters:
- *         - in: query
+ *         - in: path
  *           name: id
  *           required: true
  *           description: id of town to return
@@ -63,19 +63,19 @@ router.get('/all-towns',authToken.authenticateToken,townsController.getTowns);
  *         default:
  *           description: Unexpected error
  */
-router.get('/get-town',authToken.authenticateToken,townsController.getTownByID);
+router.get('/:id',authToken.authenticateToken,townsController.getTownByID);
 
 /**
  * @swagger
  * path:
- *   /towns/get-districttowns:
+ *   /districttowns/{districtid}:
  *     get:
  *       security:
  *         - bearerAuth: []
- *       summary: Returns a towns by district id
+ *       summary: Returns all towns by district id
  *       tags: [Towns]
  *       parameters:
- *         - in: query
+ *         - in: path
  *           name: id
  *           required: true
  *           description: id of district towns to return
@@ -95,14 +95,14 @@ router.get('/get-town',authToken.authenticateToken,townsController.getTownByID);
  *         default:
  *           description: Unexpected error
  */
-router.get('/get-districttowns',authToken.authenticateToken,townsController.getTownByDistrictID);
+router.get('/:districtid',authToken.authenticateToken,townsController.getTownByDistrictID);
 
 
 
 /**
  * @swagger
  *
- * /towns/add-town:
+ * /towns/:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -129,19 +129,19 @@ router.get('/get-districttowns',authToken.authenticateToken,townsController.getT
  *       '400':
  *         description: Unexpected error
  */
-router.post('/add-town',authToken.authenticateToken,townsController.createTown);
+router.post('/',authToken.authenticateToken,townsController.createTown);
 
 /**
  * @swagger
  *
- * /towns/update-town:
+ * /towns/{id}:
  *   put:
  *     security:
  *       - bearerAuth: []
  *     summary: Update a town
  *     tags: [Towns]
  *     parameters:
- *       - in: query
+ *       - in: path
  *         name: id
  *         required: true
  *         description: ID of town to update
@@ -168,6 +168,6 @@ router.post('/add-town',authToken.authenticateToken,townsController.createTown);
  *       '400':
  *         description: Unexpected error
  */
-router.put('/update-town',authToken.authenticateToken,townsController.updateTown);
+router.put('/:id',authToken.authenticateToken,townsController.updateTown);
 
 module.exports=router;
