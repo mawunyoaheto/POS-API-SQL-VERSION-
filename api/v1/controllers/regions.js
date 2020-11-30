@@ -90,7 +90,7 @@ async function getRegionByID(req, res, error) {
 
 
 
-//ADD OUTLET
+//ADD REGION
 
 async function createRegion(req, res) {
     var resp = new Response.Response(res);

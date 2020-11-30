@@ -17,6 +17,8 @@ const session = require('express-session');
 
 const user_routes = require("./api/v1/routes/users");
 const usercategory_routes = require("./api/v1/routes/usercategories");
+const userrolepermissions_routes = require("./api/v1/routes/user_role_permissions");
+const userlevelpermissions_routes = require("./api/v1/routes/user_access_level_permissions");
 const product_routes = require("./api/v1/routes/products");
 const productCategory_routes = require("./api/v1/routes/product_categories");
 const itembaseunit_routes = require("./api/v1/routes/itembaseunit");
@@ -38,6 +40,7 @@ const limiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
     max: 10, // 5 requests,
   })
+  global.__basedir = __dirname;
 
 const swaggerOptions = {
     swaggerDefinition: {
@@ -129,6 +132,8 @@ const swaggerOptions = {
 
   app.use('/api/v1/users',user_routes);
   app.use('/api/v1/usercategory',usercategory_routes);
+  app.use('/api/v1/userrolepermissions',userrolepermissions_routes);
+  app.use('/api/v1/userlevelpermissions',userlevelpermissions_routes);
   app.use('/api/v1/products',product_routes);
   app.use('/api/v1/productcategory',productCategory_routes);
   app.use('/api/v1/items',itembaseunit_routes);

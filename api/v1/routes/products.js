@@ -1,7 +1,9 @@
 var express = require('express');
 var router = express.Router();
-const authToken = require('../middleware/auth')
+const authToken = require('../middleware/auth');
 const productsController = require('../controllers/products');
+const uploadProductsCSVController = require('../controllers/uploadproductscsv');
+const upload = require("../util/upload");
 
 /**
  * @swagger
@@ -107,6 +109,38 @@ router.get('/:id',authToken.authenticateToken,productsController.getProductByID)
  *         description: Unexpected error
  */
 router.post('/',authToken.authenticateToken,productsController.createPoduct);
+
+
+/**
+ * @swagger
+ *
+ * /products/upload:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: Add Products from a CSV file
+ *     tags: [Products]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/octet-stream:
+ *           schema:
+ *             type: object
+ *           properties:
+ *             file:
+ *               type: string
+ *               format: binary
+ *     responses:
+ *       '201':
+ *         description: created
+ *       '402':
+ *         description: failed
+ *       '400':
+ *         description: Unexpected error
+ */
+router.post('/upload',uploadProductsCSVController.upload);
+//router.post('/upload',authToken.authenticateToken,upload.single("file"),uploadProductsCSVController.uploadProductcFromCSV);
+
 
 /**
  * @swagger
