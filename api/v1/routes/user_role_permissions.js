@@ -16,6 +16,8 @@ const userRolePermController = require('../controllers/user_role_permissions');
  * @swagger
  * /userrolepermissions/all:
  *  get:
+ *    security:
+ *      - bearerAuth: []
  *    summary: Returns all User Role Permissions
  *    tags: [User Role Permissions]
  *    description: Get all User Role Permissions
@@ -34,6 +36,8 @@ router.get('/all',authToken.authenticateToken, userRolePermController.getAllUser
  * path:
  *   /userrolepermissions/{roleid}:
  *     get:
+ *       security:
+ *         - bearerAuth: []
  *       summary: Returns Role Permissions by role id
  *       tags: [User Role Permissions]
  *       parameters:
@@ -73,29 +77,31 @@ router.get('/:roleid', authToken.authenticateToken,userRolePermController.getUse
  *         application/json:
  *           schema:
  *             type: array
- *             properties:
- *               roleid:
- *                 type: integer
- *               moduleid:
- *                 type: integer
- *               moduletransid:
- *                 type: integer
- *               transstageid:
- *                 type: integer
- *               add:
- *                 type: string
- *               edit:
- *                 type: string
- *               view:
- *                 type: string
- *               print:
- *                 type: string
- *               delete:
- *                 type: string
- *               viewlog:
- *                 type: string
- *               isactive:
- *                 type: string
+ *             items:
+ *               type: object
+ *               properties:
+ *                 roleid:
+ *                   type: integer
+ *                 moduleid:
+ *                   type: integer
+ *                 moduletransid:
+ *                   type: integer
+ *                 transstageid:
+ *                   type: integer
+ *                 add:
+ *                   type: string
+ *                 edit:
+ *                   type: string
+ *                 view:
+ *                   type: string
+ *                 print:
+ *                   type: string
+ *                 delete:
+ *                   type: string
+ *                 viewlog:
+ *                   type: string
+ *                 isactive:
+ *                   type: string
  *     responses:
  *       '201':
  *         description: created
@@ -110,6 +116,8 @@ router.post('/',authToken.authenticateToken,userRolePermController.createUserRol
  *
  * /userrolepermissions/{roleid}:
  *   put:
+ *     security:
+ *       - bearerAuth: []
  *     summary: Update User Role Permission by Role Id
  *     tags: [User Role Permissions]
  *     parameters:
@@ -125,29 +133,29 @@ router.post('/',authToken.authenticateToken,userRolePermController.createUserRol
  *         application/json:
  *           schema:
  *             type: array
- *             properties:
- *               roleid:
- *                 type: integer
- *               moduleid:
- *                 type: integer
- *               moduletransid:
- *                 type: integer
- *               transstageid:
- *                 type: integer
- *               add:
- *                 type: string
- *               edit:
- *                 type: string
- *               view:
- *                 type: string
- *               print:
- *                 type: string
- *               delete:
- *                 type: string
- *               viewlog:
- *                 type: string
- *               isactive:
- *                 type: string
+ *             items:
+ *               type: object
+ *               properties:
+ *                 moduleid:
+ *                   type: integer
+ *                 moduletransid:
+ *                   type: integer
+ *                 transstageid:
+ *                   type: integer
+ *                 add:
+ *                   type: string
+ *                 edit:
+ *                   type: string
+ *                 view:
+ *                   type: string
+ *                 print:
+ *                   type: string
+ *                 delete:
+ *                   type: string
+ *                 viewlog:
+ *                   type: string
+ *                 isactive:
+ *                   type: string
  *     responses:
  *       '201':
  *         description: created

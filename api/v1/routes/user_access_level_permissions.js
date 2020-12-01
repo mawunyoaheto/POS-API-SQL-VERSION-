@@ -16,6 +16,8 @@ const userLevePermController = require('../controllers/user_access_level_permiss
  * @swagger
  * /userlevelpermissions/all:
  *  get:
+ *    security:
+ *      - bearerAuth: []
  *    summary: Returns all User Role Permissions
  *    tags: [User Access Level Permissions]
  *    description: Get all User Acces Level Permissions
@@ -34,6 +36,8 @@ router.get('/all',authToken.authenticateToken, userLevePermController.getAllUser
  * path:
  *   /userlevelpermissions/{usercode}:
  *     get:
+ *       security:
+ *         - bearerAuth: []
  *       summary: Returns User Level Permissions by user id
  *       tags: [User Access Level Permissions]
  *       parameters:
@@ -73,29 +77,31 @@ router.get('/:usercode', authToken.authenticateToken,userLevePermController.getU
  *         application/json:
  *           schema:
  *             type: array
- *             properties:
- *               roleid:
- *                 type: integer
- *               moduleid:
- *                 type: integer
- *               moduletransid:
- *                 type: integer
- *               transstageid:
- *                 type: integer
- *               add:
- *                 type: string
- *               edit:
- *                 type: string
- *               view:
- *                 type: string
- *               print:
- *                 type: string
- *               delete:
- *                 type: string
- *               viewlog:
- *                 type: string
- *               isactive:
- *                 type: string
+ *             items:
+ *               type: object
+ *               properties:
+ *                 usercode:
+ *                   type: integer
+ *                 moduleid:
+ *                   type: integer
+ *                 moduletransid:
+ *                   type: integer
+ *                 transstageid:
+ *                   type: integer
+ *                 add:
+ *                   type: string
+ *                 edit:
+ *                   type: string
+ *                 view:
+ *                   type: string
+ *                 print:
+ *                   type: string
+ *                 delete:
+ *                   type: string
+ *                 viewlog:
+ *                   type: string
+ *                 isactive:
+ *                   type: string
  *     responses:
  *       '201':
  *         description: created
@@ -107,16 +113,17 @@ router.post('/',authToken.authenticateToken,userLevePermController.createUserAcc
 
 /**
  * @swagger
- *
  * /userlevelpermissions/{usercode}:
  *   put:
+ *     security:
+ *       - bearerAuth: []
  *     summary: Update User Level Permission by User Id
  *     tags: [User Access Level Permissions]
  *     parameters:
  *       - in: path
  *         name: usercode
  *         required: true
- *         description: Role ID of User Role Permissions to update
+ *         description: User ID of User Level Permissions to update
  *         shema:
  *           type: integer
  *     requestBody:
@@ -125,29 +132,29 @@ router.post('/',authToken.authenticateToken,userLevePermController.createUserAcc
  *         application/json:
  *           schema:
  *             type: array
- *             properties:
- *               roleid:
- *                 type: integer
- *               moduleid:
- *                 type: integer
- *               moduletransid:
- *                 type: integer
- *               transstageid:
- *                 type: integer
- *               add:
- *                 type: string
- *               edit:
- *                 type: string
- *               view:
- *                 type: string
- *               print:
- *                 type: string
- *               delete:
- *                 type: string
- *               viewlog:
- *                 type: string
- *               isactive:
- *                 type: string
+ *             items:
+ *               type: object
+ *               properties:
+ *                 moduleid:
+ *                   type: integer
+ *                 moduletransid:
+ *                   type: integer
+ *                 transstageid:
+ *                   type: integer
+ *                 add:
+ *                   type: string
+ *                 edit:
+ *                   type: string
+ *                 view:
+ *                   type: string
+ *                 print:
+ *                   type: string
+ *                 delete:
+ *                   type: string
+ *                 viewlog:
+ *                   type: string
+ *                 isactive:
+ *                   type: string
  *     responses:
  *       '201':
  *         description: created

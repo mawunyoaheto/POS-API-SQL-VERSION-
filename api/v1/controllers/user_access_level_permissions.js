@@ -5,7 +5,7 @@ var dbConfig = require('../../../config');
 var Response = require('../util/response');
 var respBody = require('../util/response');
 const { error } = require('../util/winston');
-
+const sql = require('mssql');
 const userid = `${dbConfig.app_user}`;
 const userMachineName = `${dbConfig.userMachine}`;
 const userMachineIP = `${dbConfig.userIP}`;
@@ -15,7 +15,7 @@ var userAccessRes = {};
 async function getAllUserAccessLevelPermissions(req, res, error) {
     var resp = new Response.Response(res);
 
-    const queryString = `SELECT * FROM UserAccessAccessLevelPermissions where active='Yes'`
+    const queryString = `SELECT * FROM user_accesslevelpermissions where active='True'`
     const pool = await poolPromise;
 
     try {
@@ -49,7 +49,7 @@ async function getAllUserAccessLevelPermissions(req, res, error) {
 async function getUserAccessLevelPermissionsByID(req, res, error) {
     var resp = new Response.Response(res);
     var id = req.params.usercode;
-    var queryString = `select * FROM UserAccessAccessLevelPermissions WHERE roleid='${id}' and active='Yes'`
+    var queryString = `select * FROM user_accesslevelpermissions WHERE usercode='${id}' and active='True'`
     const pool = await poolPromise;
 
     try {
@@ -82,94 +82,77 @@ async function getUserAccessLevelPermissionsByID(req, res, error) {
 }
 
 async function createUserAccessLevelPermissions(req, res) {
-    var resp = new Response.Response(res);
-    const values = [
-        req.body.roleid,
-        req.body.moduleid,
-        req.body.moduletransid,
-        req.body.transstageid,
-        req.body.add,
-        req.body.edit,
-        req.body.view,
-        req.body.print,
-        req.body.delete,
-        req.body.viewlog,
-        req.body.isactive,
-        userid,
-        userMachineName,
-        userMachineIP
-    ];
     const pool = await poolPromise;
-
-    const createQuery = `INSERT INTO UserAccessAccessLevelPermissions(usercode, moduleid,moduletransid,
-        transtageid,canadd,canedit,canview,canprint, candelete,canviewchangelog,isactive, userid) VALUES 
-        ('${req.body.roleid}','${req.body.moduleid}', '${req.body.moduletransid}','${req.body.transstageid}', 
-        '${req.body.add}','${req.body.edit}','${req.body.view}','${req.body.print}','${req.body.delete}',
-        '${req.body.viewlog}','${req.body.isactive}','${userid}', '${userMachineName}', '${userMachineIP}')`;
-
+    var resp = new Response.Response(res);
+    const transaction = new sql.Transaction(pool);
 
     try {
 
-        await pool.query(createQuery, function (err, recordset) {
-            if (err) {
-                userAccessRes = respBody.ResponseBody('failed', '', 'failed with error: ' + helper.parseError(err));
-                resp.json(404, userAccessRes);
-            } else {
-                if (recordset.rowsAffected > 0) {
+        // await pool.query('BEGIN')
+        await transaction.begin();
+        const trnxReq = new sql.Request(transaction);
 
-                    userAccessRes = respBody.ResponseBody('success', recordset.recordset, recordset.rowsAffected + ' record(s) inserted');
-                    resp.json(200, userAccessRes);
-                } else {
+        for (i=0;i<req.body.length; i++){
 
-                    userAccessRes = respBody.ResponseBody('success', '', 'record(s) insert failed');
-                    resp.json(404, userAccessRes);
+            const createQuery = `INSERT INTO user_accesslevelpermissions(usercode, moduleid,moduletransid,
+                transtageid,canadd,canedit,canview,canprint, candelete,canviewchangelog,active, userid,usermachinename,usermachineip) VALUES 
+                ('${req.body[i].usercode}','${req.body[i].moduleid}', '${req.body[i].moduletransid}','${req.body[i].transstageid}', 
+                '${req.body[i].add}','${req.body[i].edit}','${req.body[i].view}','${req.body[i].print}','${req.body[i].delete}',
+                '${req.body[i].viewlog}','${req.body[i].isactive}','${userid}', '${userMachineName}', '${userMachineIP}')`;
 
-                }
-            }
-        });
+                recordset = await trnxReq.query(createQuery);
+        }
+
+        await transaction.commit();
+
+        userAccessRes = respBody.ResponseBody('success', '', req.body.length + ' Access Level Permissions created ');
+        resp.json(200, userAccessRes);
 
     } catch (error) {
 
+        await transaction.rollback();
         userAccessRes = respBody.ResponseBody('failed', '', 'failed with error: ' + helper.parseError(error));
         resp.json(404, userAccessRes);
     }
 }
 
 async function updateUserAccessLevelPermissions(req, res) {
-    var resp = new Response.Response(res);
-    normalizedDate = new Date(Date.now()).toISOString();
+
     const pool = await poolPromise;
+    var resp = new Response.Response(res);
+    const transaction = new sql.Transaction(pool);
+    var userCode = req.params.usercode;
 
-    const updateQuery = `UPDATE UserAccessAccessLevelPermissions SET usercode='${req.body.usercode}', moduleid ='${req.body.moduleid}'
-    ,moduletransid='${req.body.moduletransid}',transtageid='${req.body.transstageid}',canadd='${req.body.add}',
-    canedit='${req.body.edit}',canview='${req.body.view}',canprint='${req.body.print}', candelete='${req.body.delete}',
-    canviewchangelog='${req.body.viewlog}',isactive='${req.body.isactive}', userid='${userid}',
-    modified_date='${normalizedDate}',modifier_userid='${userid}',usermachinename='${userMachineName}',
-    usermachineip='${userMachineIP}' WHERE id ='${id}'`;
-
-
+    normalizedDate = new Date(Date.now()).toISOString();
     try {
 
-        await pool.query(updateQuery, function (err, recordset) {
-            if (err) {
-                userAccessRes = respBody.ResponseBody('failed', '', 'failed with error: ' + helper.parseError(err));
-                resp.json(404, userAccessRes);
-            } else {
-                if (recordset.rowsAffected > 0) {
+        // await pool.query('BEGIN')
+        await transaction.begin();
+        const trnxReq = new sql.Request(transaction);
 
-                    userAccessRes = respBody.ResponseBody('success', '', recordset.rowsAffected + ' record(s) updated');
-                    resp.json(200, userAccessRes);
-                } else {
+        var deleteQuery =`DELETE FROM user_accesslevelpermissions WHERE usercode='${userCode}'`;
 
-                    userAccessRes = respBody.ResponseBody('success', '', 'record(s) insert failed');
-                    resp.json(404, userAccessRes);
+        await trnxReq.query(deleteQuery);
+        
+        for (i=0;i<req.body.length; i++){
 
-                }
-            }
-        });
+            const createQuery = `INSERT INTO user_accesslevelpermissions(usercode, moduleid,moduletransid,
+                transtageid,canadd,canedit,canview,canprint, candelete,canviewchangelog,active, userid,usermachinename,usermachineip) VALUES 
+                ('${userCode}','${req.body[i].moduleid}', '${req.body[i].moduletransid}','${req.body[i].transstageid}', 
+                '${req.body[i].add}','${req.body[i].edit}','${req.body[i].view}','${req.body[i].print}','${req.body[i].delete}',
+                '${req.body[i].viewlog}','${req.body[i].isactive}','${userid}', '${userMachineName}', '${userMachineIP}')`;
+
+                recordset = await trnxReq.query(createQuery);
+        }
+
+        await transaction.commit();
+
+        userAccessRes = respBody.ResponseBody('success', '', req.body.length + ' Access Level Permissions updated ');
+        resp.json(200, userAccessRes);
 
     } catch (error) {
 
+        await transaction.rollback();
         userAccessRes = respBody.ResponseBody('failed', '', 'failed with error: ' + helper.parseError(error));
         resp.json(404, userAccessRes);
     }

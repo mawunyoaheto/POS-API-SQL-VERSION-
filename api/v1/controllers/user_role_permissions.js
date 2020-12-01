@@ -5,7 +5,7 @@ var dbConfig = require('../../../config');
 var Response = require('../util/response');
 var respBody = require('../util/response');
 const { error } = require('../util/winston');
-
+const sql = require('mssql');
 const userid = `${dbConfig.app_user}`;
 const userMachineName = `${dbConfig.userMachine}`;
 const userMachineIP = `${dbConfig.userIP}`;
@@ -15,7 +15,7 @@ var userRolesRes = {};
 async function getAllUserRolePermissions(req, res, error) {
     var resp = new Response.Response(res);
 
-    const queryString = `SELECT * FROM UserRoleAccessLevelPermissions where active='Yes'`
+    const queryString = `SELECT * FROM user_roleaccesslevelpermissions where active='True'`
     const pool = await poolPromise;
 
     try {
@@ -49,7 +49,7 @@ async function getAllUserRolePermissions(req, res, error) {
 async function getUserRolePermissionsByID(req, res, error) {
     var resp = new Response.Response(res);
     var id = req.params.roleid;
-    var queryString = `select * FROM UserRoleAccessLevelPermissions WHERE roleid='${id}' and active='Yes'`
+    var queryString = `select * FROM user_roleaccesslevelpermissions WHERE roleid='${id}' and active='True'`
     const pool = await poolPromise;
 
     try {
@@ -82,96 +82,78 @@ async function getUserRolePermissionsByID(req, res, error) {
 }
 
 async function createUserRolePermissions(req, res) {
-    var resp = new Response.Response(res);
-    const values = [
-        req.body.roleid,
-        req.body.moduleid,
-        req.body.moduletransid,
-        req.body.transstageid,
-        req.body.add,
-        req.body.edit,
-        req.body.view,
-        req.body.print,
-        req.body.delete,
-        req.body.viewlog,
-        req.body.isactive,
-        userid,
-        userMachineName,
-        userMachineIP
-    ];
     const pool = await poolPromise;
-
-    const createQuery = `INSERT INTO UserRoleAccessLevelPermissions(roleid, moduleid,moduletransid,
-        transtageid,canadd,canedit,canview,canprint, candelete,canviewchangelog,isactive, userid) VALUES 
-        ('${req.body.roleid}','${req.body.moduleid}', '${req.body.moduletransid}','${req.body.transstageid}', 
-        '${req.body.add}','${req.body.edit}','${req.body.view}','${req.body.print}','${req.body.delete}',
-        '${req.body.viewlog}','${req.body.isactive}','${userid}', '${userMachineName}', '${userMachineIP}')`;
-
+    var resp = new Response.Response(res);
+    const transaction = new sql.Transaction(pool);
 
     try {
 
-        await pool.query(createQuery, function (err, recordset) {
-            if (err) {
-                userRolesRes = respBody.ResponseBody('failed', '', 'failed with error: ' + helper.parseError(err));
-                resp.json(404, userRolesRes);
-            } else {
-                if (recordset.rowsAffected > 0) {
+        // await pool.query('BEGIN')
+        await transaction.begin();
+        const trnxReq = new sql.Request(transaction);
 
-                    userRolesRes = respBody.ResponseBody('success', recordset.recordset, recordset.rowsAffected + ' record(s) inserted');
-                    resp.json(200, userRolesRes);
-                } else {
+        for (i=0;i<req.body.length; i++){
 
-                    userRolesRes = respBody.ResponseBody('success', '', 'record(s) insert failed');
-                    resp.json(404, userRolesRes);
+            const createQuery = `INSERT INTO user_roleaccesslevelpermissions(roleid, moduleid,moduletransid,
+                transtageid,canadd,canedit,canview,canprint, candelete,canviewchangelog,active, userid,usermachinename,usermachineip) VALUES 
+                ('${req.body[i].roleid}','${req.body[i].moduleid}', '${req.body[i].moduletransid}','${req.body[i].transstageid}', 
+                '${req.body[i].add}','${req.body[i].edit}','${req.body[i].view}','${req.body[i].print}','${req.body[i].delete}',
+                '${req.body[i].viewlog}','${req.body[i].isactive}','${userid}', '${userMachineName}', '${userMachineIP}')`;
 
-                }
-            }
-        });
+                recordset = await trnxReq.query(createQuery);
+        }
+
+        await transaction.commit();
+
+        userRolesRes = respBody.ResponseBody('success', '', req.body.length + ' Access Level Permissions created ');
+        resp.json(200, userRolesRes);
 
     } catch (error) {
 
+        await transaction.rollback();
         userRolesRes = respBody.ResponseBody('failed', '', 'failed with error: ' + helper.parseError(error));
         resp.json(404, userRolesRes);
     }
 }
 
 async function updateUserRolePermissions(req, res) {
-    var resp = new Response.Response(res);
-    normalizedDate = new Date(Date.now()).toISOString();
     const pool = await poolPromise;
+    var resp = new Response.Response(res);
+    const transaction = new sql.Transaction(pool);
+    var userRole = req.params.userrole;
 
-    const updateQuery = `UPDATE UserRoleAccessLevelPermissions SET roleid='${req.body.roleid}', moduleid ='${req.body.moduleid}'
-    ,moduletransid='${req.body.moduletransid}',transtageid='${req.body.transstageid}',canadd='${req.body.add}',
-    canedit='${req.body.edit}',canview='${req.body.view}',canprint='${req.body.print}', candelete='${req.body.delete}',
-    canviewchangelog='${req.body.viewlog}',isactive='${req.body.isactive}', userid='${userid}',
-    modified_date='${normalizedDate}',modifier_userid='${userid}',usermachinename='${userMachineName}',
-    usermachineip='${userMachineIP}' WHERE id ='${id}'`;
-
-
+    normalizedDate = new Date(Date.now()).toISOString();
     try {
 
-        await pool.query(updateQuery, function (err, recordset) {
-            if (err) {
-                userRolesRes = respBody.ResponseBody('failed', '', 'failed with error: ' + helper.parseError(err));
-                resp.json(404, userRolesRes);
-            } else {
-                if (recordset.rowsAffected > 0) {
+        // await pool.query('BEGIN')
+        await transaction.begin();
+        const trnxReq = new sql.Request(transaction);
 
-                    userRolesRes = respBody.ResponseBody('success', '', recordset.rowsAffected + ' record(s) updated');
-                    resp.json(200, userRolesRes);
-                } else {
+        var deleteQuery =`DELETE FROM user_roleaccesslevelpermissions WHERE roleid='${userRole}'`;
 
-                    userRolesRes = respBody.ResponseBody('success', '', 'record(s) insert failed');
-                    resp.json(404, userRolesRes);
+        await trnxReq.query(deleteQuery);
+        
+        for (i=0;i<req.body.length; i++){
 
-                }
-            }
-        });
+            const createQuery = `INSERT INTO user_roleaccesslevelpermissions(roleid, moduleid,moduletransid,
+                transtageid,canadd,canedit,canview,canprint, candelete,canviewchangelog,active, userid,usermachinename,usermachineip) VALUES 
+                ('${userRole}','${req.body[i].moduleid}', '${req.body[i].moduletransid}','${req.body[i].transstageid}', 
+                '${req.body[i].add}','${req.body[i].edit}','${req.body[i].view}','${req.body[i].print}','${req.body[i].delete}',
+                '${req.body[i].viewlog}','${req.body[i].isactive}','${userid}', '${userMachineName}', '${userMachineIP}')`;
+
+                recordset = await trnxReq.query(createQuery);
+        }
+
+        await transaction.commit();
+
+        userAccessRes = respBody.ResponseBody('success', '', req.body.length + ' Access Level Permissions updated ');
+        resp.json(200, userAccessRes);
 
     } catch (error) {
 
-        userRolesRes = respBody.ResponseBody('failed', '', 'failed with error: ' + helper.parseError(error));
-        resp.json(404, userRolesRes);
+        await transaction.rollback();
+        userAccessRes = respBody.ResponseBody('failed', '', 'failed with error: ' + helper.parseError(error));
+        resp.json(404, userAccessRes);
     }
 }
 
