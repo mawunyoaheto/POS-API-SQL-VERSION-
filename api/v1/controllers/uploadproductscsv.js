@@ -9,13 +9,15 @@ const csvToJson = require('csvtojson');
 const fs = require("fs");
 const fastcsv = require("fast-csv");
 const uploadFile = require('../util/upload');
+const itemBaseUnit = require('../controllers/itembaseunit');
+const productCategory = require('../controllers/product_categories');
 
 const userid = `${dbConfig.app_user}`;
 const userMachineName = `${dbConfig.userMachine}`;
 const userMachineIP = `${dbConfig.userIP}`;
 var productsRes = {};
 
-const upload = async (req, res, done) => {
+async function uploadProducts(req, res, done) {
 
   const pool = await poolPromise;
   var resp = new Response.Response(res);
@@ -31,7 +33,7 @@ const upload = async (req, res, done) => {
       resp.json(400, productsRes);
     }
 
-    console.log("Uploaded the file successfully: " + req.file.originalname)
+    //console.log("Uploaded the file successfully: " + req.file.originalname)
     let path = __basedir + "/resources/static/assets/uploads/" + req.file.originalname;
 
     var csvData = [];
@@ -43,7 +45,7 @@ const upload = async (req, res, done) => {
       .on("data", function (data) {
         csvData.push(data);
       })
-      .on("end", function () {
+      .on("end", async function () {
 
         // remove the first line: header
         csvData.shift();
@@ -51,37 +53,41 @@ const upload = async (req, res, done) => {
 
         try {
 
-          
-      const readCSV = await csvToJson({
-        trim:true
-    }).fromFile(path);
-
-    // Code executes after recipients are fully loaded.
-    readCSV.forEach((readCSV) => {
-      csvData.push(readCSV);
-
-    });
-
           await transaction.begin();
           const trnxReq = new sql.Request(transaction);
 
           for (i = 2; i < csvData.length; i++) {
 
-            console.log(csvData[i]['description'],csvData[i]['cost_price']);
+            var itemBaseID = 100;
+            var productCatID = 101;
+
+            console.log(csvData[i]['baseunit'])
+
+            const itemBaseRecordset = await itemBaseUnit.getItemBaseByDescription(csvData[i]['baseunit']);
+            if (itemBaseRecordset.length > 0) {
+              itemBaseID = itemBaseRecordset[0].id;
+            }
+            const productCategoryRecordset = await productCategory.getProductCategoryByDescription(csvData[i]['category']);
+            if (productCategoryRecordset.length > 0) {
+              productCatID = productCategoryRecordset[0].id;
+            }
 
             const createProductQuery = `INSERT INTO products(description, extended_description, product_code, cost_price, s_price, category_id,baseunit_id, 
               create_userid, usermachinename, usermachineip)
-              VALUES ('${csvData[i]['description']}','${csvData[i]['description']}', '${csvData[i]['product_code']}', '${req.body.cost_price}', '${csvData[i]['s_price']}', 
-                '${csvData[i]['category']}', '${csvData[i]['baseunit']}', '${userid}', '${userMachineName}', '${userMachineIP}')`;
-            
-                await trnxReq.query(createProductQuery);
+              VALUES ('${csvData[i]['description']}','${csvData[i]['ext_description']}', '${csvData[i]['product_code']}', '${csvData[i]['cost_price']}', '${csvData[i]['s_price']}', 
+                '${productCatID}', '${itemBaseID}', '${userid}', '${userMachineName}', '${userMachineIP}')`;
+
+            await trnxReq.query(createProductQuery);
           }
+
+          await transaction.commit();
           productsRes = respBody.ResponseBody('success', '', "inserted " + res.rowCount + " row:");
           resp.json(201, productsRes);
-          
-        
+
+
         }
         catch (err) {
+          await transaction.rollback();
           console.log(err.stack);
           fs.unlinkSync(path);
           productsRes = respBody.ResponseBody('failed', err.stack, '');
@@ -95,6 +101,7 @@ const upload = async (req, res, done) => {
     stream.pipe(csvStream);
   } catch (err) {
 
+    await transaction.rollback();
     productsRes = respBody.ResponseBody('failed', 'Could not upload the file:', 'failed with error: ' + err);
     resp.json(500, productsRes);
   }
@@ -123,16 +130,34 @@ function validateCsvRow(row) {
   return;
 }
 
+function writeToCSVFile(users) {
+  const filename = 'output.csv';
+  fs.writeFile(filename, extractAsCSV(users), err => {
+    if (err) {
+      console.log('Error writing to csv file', err);
+    } else {
+      console.log(`saved as ${filename}`);
+    }
+  });
+}
 
-    //   const readCSV = await csvToJson({
-    //     trim:true
-    // }).fromFile(path);
+function extractAsCSV(users) {
+  const header = ["Username, Password, Roles"];
+  const rows = users.map(user =>
+    `${user.username}, ${user.password}, ${user.roles}`
+  );
+  return header.concat(rows).join("\n");
+}
 
-    // // Code executes after recipients are fully loaded.
-    // readCSV.forEach((readCSV) => {
-    //   csvData.push(readCSV);
+//   const readCSV = await csvToJson({
+//     trim:true
+// }).fromFile(path);
 
-    // });
+// // Code executes after recipients are fully loaded.
+// readCSV.forEach((readCSV) => {
+//   csvData.push(readCSV);
+
+// });
 module.exports = {
-  upload
+  uploadProducts
 }

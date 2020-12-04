@@ -164,9 +164,31 @@ async function getProductCategories(req, res, error) {
     }
   
   }
+
+  //GET PRODUCT CATEGORY BY DESCRIPTION
+  async function getProductCategoryByDescription(description){
+    const pool = await poolPromise;
+
+  const queryString = `select * FROM product_categories WHERE category='${description}'` 
+
+  try {
+
+    const recordset = await pool.query(queryString);
+
+            if (recordset.rowsAffected > 0) {
+               return recordset.recordset
+              } else {
+               return "";
+              }
+        
+      } catch (error) {
+    return error;
+   }
+  }
   module.exports = {
     createPoductCategory,
     getProductCategories,
     getProductCategoryID,
-    updateProductCategory
+    updateProductCategory,
+    getProductCategoryByDescription
   }

@@ -51,31 +51,12 @@ async function getItemBaseUnitByID(req, res) {
   var resp = new Response.Response(res);
   const id = req.params.id;
 
-  //const pool = await db.dbConnection()
-
-  const pool = await poolPromise;
-
-  const queryString = `select * FROM itembaseunits WHERE id=${id}`
-
   try {
 
-    pool.query(queryString, function (err, recordset) {
+     const itembase = await getItemBaseByID(id);
 
-        if (err) {
-            itemBaseRes= respBody.ResponseBody('success','',recordset.rowsAffected + ' record(s) found');
-            resp.json(404, itemBaseRes);
-
-        } else {
-            if (recordset.rowsAffected > 0) {
-                // send records as a response
-                itemBaseRes= respBody.ResponseBody('success',recordset.recordset,recordset.rowsAffected + ' record(s) found');
-                resp.json(200, itemBaseRes);
-              } else {
-                itemBaseRes= respBody.ResponseBody('success','',recordset.rowsAffected + ' record(s) found');
-                resp.json(404, itemBaseRes);
-              }
-        }
-    });
+     itemBaseRes= respBody.ResponseBody('success',itembase,'' + ' record(s) found');
+     resp.json(200, itemBaseRes);
 
   } catch (error) {
     itemBaseRes= respBody.ResponseBody('failed','','failed with error: ' + helper.parseError(error));
@@ -168,10 +149,59 @@ async function updateItemBaseUnit(req, res, error) {
 
 }
 
+//funtion to get itembase 
+async function getItemBaseByID(id){
+
+  //const pool = await db.dbConnection()
+
+  const pool = await poolPromise;
+
+  const queryString = `select * FROM itembaseunits WHERE id=${id}` 
+
+  try {
+
+    const recordset = await pool.query(queryString);
+
+            if (recordset.rowsAffected > 0) {
+               return recordset.recordset
+              } else {
+               return "";
+              }
+        
+      } catch (error) {
+    return error;
+   }
+}
+
+//funtion to get itembase by description
+async function getItemBaseByDescription(description){
+
+  //const pool = await db.dbConnection()
+
+  const pool = await poolPromise;
+
+  const queryString = `select * FROM itembaseunits WHERE baseunit='${description}'` 
+
+  try {
+
+    const recordset = await pool.query(queryString);
+
+            if (recordset.rowsAffected > 0) {
+               return recordset.recordset
+              } else {
+               return "";
+              }
+        
+      } catch (error) {
+    return error;
+   }
+}
 
 module.exports = {
   getItemBaseUnits,
   getItemBaseUnitByID,
   createItemBaseUnit,
   updateItemBaseUnit,
+  getItemBaseByID,
+  getItemBaseByDescription
 }
