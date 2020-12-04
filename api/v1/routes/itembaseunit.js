@@ -26,7 +26,7 @@ router.get('/all',authToken.authenticateToken,itemsController.getItemBaseUnits);
 /**
  * @swagger
  * path:
- *   /itembaseunit/{id}:
+ *   /items/itembaseunit/{id}:
  *     get:
  *       security:
  *         - bearerAuth: []
@@ -53,7 +53,7 @@ router.get('/all',authToken.authenticateToken,itemsController.getItemBaseUnits);
  *         default:
  *           description: Unexpected error
  */
-router.get('/:id',authToken.authenticateToken,itemsController.getItemBaseUnitByID);
+router.get('/itembaseunit/:id',authToken.authenticateToken,itemsController.getItemBaseUnitByID);
 
 
 /**

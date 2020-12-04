@@ -138,7 +138,7 @@ router.post('/',authToken.authenticateToken,productsController.createPoduct);
  *       '400':
  *         description: Unexpected error
  */
-router.post('/upload',uploadProductsCSVController.upload);
+router.post('/upload',uploadProductsCSVController.uploadProducts);
 //router.post('/upload',authToken.authenticateToken,upload.single("file"),uploadProductsCSVController.uploadProductcFromCSV);
 
 
