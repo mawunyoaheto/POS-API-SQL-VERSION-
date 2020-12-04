@@ -158,9 +158,36 @@ async function updateUserAccessLevelPermissions(req, res) {
     }
 }
 
+
+async function getUserAccessLevelByID(userID) {
+
+    var queryString = `select * FROM user_accesslevelpermissions WHERE usercode='${userID}' and active='True'`
+    const pool = await poolPromise;
+
+    try {
+
+        recordset = await pool.query(queryString); 
+
+            if (recordset.rowsAffected>0) {
+
+                   // send records as a response
+                   return recordset.recordset;
+
+            } else {
+               return "";
+
+            }
+
+    } catch (error) {
+        return error;
+    }
+
+}
+
 module.exports={
     getAllUserAccessLevelPermissions,
     getUserAccessLevelPermissionsByID,
     createUserAccessLevelPermissions,
-    updateUserAccessLevelPermissions
+    updateUserAccessLevelPermissions,
+    getUserAccessLevelByID
 }

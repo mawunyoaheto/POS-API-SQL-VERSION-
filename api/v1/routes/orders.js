@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const authToken = require('../middleware/auth')
 const ordersController = require('../controllers/orders');
+const auth = require('../middleware/auth');
 
 
 
@@ -68,7 +69,7 @@ router.get('/ip', function (req, res){
 });
 
 
-router.get('/product', function(req,res){
+router.get('/product', auth.authenticateToken,function(req,res){
     
 
     var respn = ordersController.getProductDetails(req.query.productid, req.query.outletid);

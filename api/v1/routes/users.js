@@ -1,10 +1,9 @@
 var express = require('express');
 var router = express.Router();
-//const authToken = require('../middleware/auth')
-//const detailsController = require('../controllers/details');
 const usersController = require('../controllers/users');
 const genToken = require('../util/generateToken');
 const passport = require('passport');
+const auth = require('../middleware/auth');
 
 /**
  * @swagger
@@ -22,8 +21,10 @@ const passport = require('passport');
 /**
  * @swagger
  * path:
- *   /user/{id}:
+ *   /users/{id}:
  *     get:
+ *       security:
+ *         - bearerAuth: []
  *       summary: Returns a User by id
  *       tags: [Users]
  *       parameters:
@@ -47,12 +48,14 @@ const passport = require('passport');
  *         default:
  *           description: Unexpected error
  */
-router.get('/user/:id', usersController.getUserByID);
+router.get('/:id',auth.authenticateToken, usersController.getUserByID);
 
 /**
  * @swagger
- * /api/v1/users/allusers:
+ * /users/all:
  *  get:
+ *    security:
+ *      - bearerAuth: []
  *    summary: Returns all Users
  *    tags: [Users]
  *    description: Get all Users
@@ -64,7 +67,7 @@ router.get('/user/:id', usersController.getUserByID);
  *      '400':
  *        description: Unexpected error
  */
-router.get('/allusers', usersController.getAllUsers);
+router.get('/all',auth.authenticateToken, usersController.getAllUsers);
 
 //User Dash route
 router.get('/dashboard', usersController.userDashboard);
@@ -77,8 +80,10 @@ router.get('/dashboard', usersController.userDashboard);
 /**
  * @swagger
  *
- * /createuser:
+ * /users:
  *   post:
+ *     security:
+ *       - bearerAuth: []
  *     summary: Add a User
  *     tags: [Users]
  *     requestBody:
@@ -105,15 +110,40 @@ router.get('/dashboard', usersController.userDashboard);
  *               cellphone:
  *                 type: string
  *               blocked:
- *                 type: boolean
+ *                 type: string
  *               create_userid:
  *                 type: integer
+ *               accesslevels:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     moduleid:
+ *                       type: integer
+ *                     moduletransid:
+ *                       type: integer
+ *                     transstageid:
+ *                       type: integer
+ *                     add:
+ *                       type: string
+ *                     edit:
+ *                       type: string
+ *                     view:
+ *                       type: string
+ *                     print:
+ *                       type: string
+ *                     delete:
+ *                       type: string
+ *                     viewlog:
+ *                       type: string
+ *                     isactive:
+ *                       type: string
  *               useroutlets:
  *                 type: array
  *                 items:
  *                   type: object
  *                   properties:
- *                     id:
+ *                     outletid:
  *                       type: integer            
  *     responses:
  *       '201':
@@ -121,13 +151,14 @@ router.get('/dashboard', usersController.userDashboard);
  *       '400':
  *         description: Unexpected error
  */
-router.post('/createuser', usersController.createUser);
+router.post('/',auth.authenticateToken, usersController.createUser);
 
 /**
  * @swagger
- *
- * /updateuser/{id}:
+ * /users/{id}:
  *   put:
+ *     security:
+ *       - bearerAuth: []
  *     summary: Update a User
  *     tags: [Users]
  *     parameters:
@@ -157,17 +188,42 @@ router.post('/createuser', usersController.createUser);
  *               cellphone:
  *                 type: string
  *               blocked:
- *                 type: boolean
+ *                 type: string
  *               archived:
- *                 type: boolean
+ *                 type: string
  *               userid:
  *                 type: integer
+ *               accesslevels:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     moduleid:
+ *                       type: integer
+ *                     moduletransid:
+ *                       type: integer
+ *                     transstageid:
+ *                       type: integer
+ *                     add:
+ *                       type: string
+ *                     edit:
+ *                       type: string
+ *                     view:
+ *                       type: string
+ *                     print:
+ *                       type: string
+ *                     delete:
+ *                       type: string
+ *                     viewlog:
+ *                       type: string
+ *                     isactive:
+ *                       type: string
  *               useroutlets:
  *                 type: array
  *                 items:
  *                   type: object
  *                   properties:
- *                     id:
+ *                     outletid:
  *                       type: integer            
  *     responses:
  *       '201':
@@ -175,7 +231,7 @@ router.post('/createuser', usersController.createUser);
  *       '400':
  *         description: Unexpected error
  */
-router.put('/updateuser/:id', usersController.updateUser);
+router.put('/:id',auth.authenticateToken, usersController.updateUser);
 
 
 // User Login
